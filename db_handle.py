@@ -1,4 +1,5 @@
 from beanie import init_beanie
+from fastapi import HTTPException
 from motor.motor_asyncio import AsyncIOMotorClient
 from models import ClientModel, UpdateClientModel
 from config import MONGO_DB_NAME, MONGO_URI
@@ -12,8 +13,8 @@ async def init_db():
         return e
 
 
-async def add_client(nome_in,email_in,cpf_in):
-    client_to_add = ClientModel(nome=nome_in, email=email_in, cpf=cpf_in)
+async def add_client(client_data: ClientModel):
+    client_to_add = ClientModel(**client_data.model_dump())
     try:
         result = await client_to_add.insert()
     except Exception as e:
@@ -31,24 +32,23 @@ async def update_client(desired_cpf: str, data_to_update: UpdateClientModel):
     if desired_client:
         for campo, valor in data_to_update.model_dump(exclude_unset=True).items():
             setattr(desired_client, campo, valor)
-        try:
-            result = await desired_client.save()
-        except Exception as e:
-            result = e
-        return result
+
+        result = await desired_client.save()
+        if result:
+            return {"message": f"Cliente com CPF {desired_cpf} alterado com sucesso."}
+        else:
+            raise HTTPException(status_code=404, detail=f"Cliente com CPF {desired_cpf} não encontrado.") 
     else:
-        return desired_client
-        
+        raise HTTPException(status_code=404, detail=f"Cliente com CPF {desired_cpf} não encontrado.")
+
+
 
 async def delete_client(desired_cpf: str):
     desired_client = await ClientModel.find_one(ClientModel.cpf == desired_cpf)
-    if desired_cpf:
-        try:
-            result = await desired_client.delete()
-        except Exception as e:
-            result = e
-        return result
-    else:
-        return desired_client
 
-   
+    result = await desired_client.delete()
+    if result.deleted_count == 1:
+        return {"message": f"Cliente com CPF {desired_cpf} deletado com sucesso."}
+    else:
+        raise HTTPException(status_code=404, detail=f"Cliente com CPF {desired_cpf} não encontrado.")
+         
