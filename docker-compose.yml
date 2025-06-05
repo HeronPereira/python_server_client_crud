@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:6
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    networks:
+      - app-net
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: fastapi-server
+    depends_on:
+      - mongo
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGO_DB_NAME=meubanco
+      - COLLECTION_CLIENT=clientes
+      - MONGO_URI=mongodb://mongo:27017
+      - SECRET_KEY=segredo
+      - ALGORITHM=HS256
+    networks:
+      - app-net
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: fastapi-client
+    depends_on:
+      - server
+    environment:
+      - BASE_URL=http://server:8000
+    networks:
+      - app-net
+    command: ["python", "client.py"]
+
+networks:
+  app-net:

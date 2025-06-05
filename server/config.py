@@ -1,13 +1,11 @@
 
+import os
 from pydantic_settings import BaseSettings
 # config.py
 DEBUG_MODE = True
 EXPIRE_DELTA = 30
-BASE_URL = "http://127.0.0.1:8000"
-CREDENTIALS = {
-    "username": "myname",
-    "password": "mypass"
-}
+
+BASE_URL = os.getenv("BASE_URL", "http://127.0.0.1:8000")
 
 
 class Settings(BaseSettings):
