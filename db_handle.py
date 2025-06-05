@@ -2,12 +2,12 @@ from beanie import init_beanie
 from fastapi import HTTPException
 from motor.motor_asyncio import AsyncIOMotorClient
 from models import ClientModel, UpdateClientModel
-from config import MONGO_DB_NAME, MONGO_URI
+from config import settings
 
 async def init_db():
-    client = AsyncIOMotorClient(MONGO_URI)
+    client = AsyncIOMotorClient(settings.MONGO_URI)
     try:
-        await init_beanie(database=client[MONGO_DB_NAME], document_models=[ClientModel])
+        await init_beanie(database=client[settings.MONGO_DB_NAME], document_models=[ClientModel])
         return True
     except Exception as e:
         return e
@@ -45,10 +45,13 @@ async def update_client(desired_cpf: str, data_to_update: UpdateClientModel):
 
 async def delete_client(desired_cpf: str):
     desired_client = await ClientModel.find_one(ClientModel.cpf == desired_cpf)
-
-    result = await desired_client.delete()
-    if result.deleted_count == 1:
-        return {"message": f"Cliente com CPF {desired_cpf} deletado com sucesso."}
+    if desired_client:
+        result = await desired_client.delete()
+        if result.deleted_count == 1:
+            return {"message": f"Cliente com CPF {desired_cpf} deletado com sucesso."}
+        else:
+            raise HTTPException(status_code=404, detail=f"Cliente com CPF {desired_cpf} não encontrado.")
     else:
         raise HTTPException(status_code=404, detail=f"Cliente com CPF {desired_cpf} não encontrado.")
+        
          

@@ -1,15 +1,20 @@
 
+from pydantic_settings import BaseSettings
 # config.py
-
-# Nome do banco de dados
-MONGO_DB_NAME = "basedesafio"
-
-COLLECTION_CLIENT = "clientes"
-
-MONGO_URI = "mongodb://localhost:27017"
-
 DEBUG_MODE = True
+EXPIRE_DELTA = 30
 
+class Settings(BaseSettings):
+    MONGO_DB_NAME:str
+    COLLECTION_CLIENT:str
+    MONGO_URI:str
+    SECRET_KEY:str
+    ALGORITHM:str
+
+    class Config:
+        env_file = ".env"
+
+settings = Settings()
 
 
 

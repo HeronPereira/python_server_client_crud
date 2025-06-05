@@ -15,3 +15,7 @@ class UpdateClientModel(BaseModel):
     nome: Optional[str] = None
     email: Optional[EmailStr] = None
     cpf: Optional[str] = None
+
+class LoginModel(BaseModel):
+    username: str = Field(..., min_length=1)
+    password: str = Field(...,min_length=1)

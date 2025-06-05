@@ -39,11 +39,3 @@ app.include_router(router)
 @app.on_event("startup")
 async def on_startup():
     await db_handle.init_db()
-#async def main():
-#    if DEBUG_MODE:
-        #direct_crud_test()
-
-        
-
-#if __name__ == '__main__':
-#    asyncio.run(main())
