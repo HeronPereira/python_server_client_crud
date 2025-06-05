@@ -26,7 +26,7 @@ async def delete_client(cpf: str, user: str = Depends(verify_token)):
 
 @router.post("/login")
 async def login(dados: LoginModel):
-    if dados.username != FAKE_USER["username"] or not hash_password.very_encoded_password(dados.password, FAKE_USER["password"]):
+    if dados.username != FAKE_USER["username"] or not hash_password.verify_encoded_password(dados.password, FAKE_USER["password"]):
         raise HTTPException(status_code=401, detail="Credenciais inválidas")
     
     token = create_token(dados.username)
