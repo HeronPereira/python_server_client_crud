@@ -30,5 +30,5 @@ async def login(dados: LoginModel):
         raise HTTPException(status_code=401, detail="Credenciais inválidas")
     
     token = create_token(dados.username)
-    return  {"access_token": token, "token_type": "bearers"}
+    return  {"access_token": token, "token_type": "bearer"}
 

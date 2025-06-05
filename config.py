@@ -3,6 +3,12 @@ from pydantic_settings import BaseSettings
 # config.py
 DEBUG_MODE = True
 EXPIRE_DELTA = 30
+BASE_URL = "http://127.0.0.1:8000"
+CREDENTIALS = {
+    "username": "myname",
+    "password": "mypass"
+}
+
 
 class Settings(BaseSettings):
     MONGO_DB_NAME:str

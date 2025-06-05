@@ -2,9 +2,9 @@ from jose import jwt, JWTError
 from datetime import datetime, timedelta, timezone
 from config import settings, EXPIRE_DELTA
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+bearer_scheme = HTTPBearer()
 
 def create_token(username: str):
     expire_timeout = datetime.now(timezone.utc) + timedelta(minutes=EXPIRE_DELTA)
@@ -16,7 +16,8 @@ def create_token(username: str):
     return token
 
 
-def verify_token(token: str = Depends):
+def verify_token(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
+    token = credentials.credentials
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
         subject = payload.get("sub")
